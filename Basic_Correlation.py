@@ -39,18 +39,18 @@ ax[2].plot(x, c,'--', label='c')
 ax[2].set_title('Time-Series C')
 
 
-def cross_correlation(a, b):
+def correlation(a, b):
     """
     a: numpy vector of length n
     b: numpy vector of length n
     
-    Returns: un-normalized cross-correlation values
+    Returns: un-normalized correlation values
     
-    Cross-correlation is at its core, just multipyling corresponding values
+    Correlation is at its core, just multipyling corresponding values
     (meaning they have the same index) between two vectors of the same length,
     where the values within the vector are just the y-value of the time-series.
     
-    The cross-correlation value is the SUM of the product of each corresponding
+    The correlation value is the SUM of the product of each corresponding
     values between the two time-series.
     
     Note - it is unitless! It's just a relative comparison of how similar two
@@ -60,24 +60,24 @@ def cross_correlation(a, b):
     in one matrix is abnormally high or low, it will far outweigh the rest
     of the values contributing to the sum. This means that it will overpower
     what's happening on average between the two functions. In more technical
-    terms, cross-correlation is highly suspectible to the power of the functions.
+    terms, correlation is highly suspectible to the power of the functions.
     
-    This is why normalized cross-correlation is much better in practice.
+    This is why normalized correlation is much better in practice.
     """
-    cross_correlation = 0 # Begin with a value of 0
+    correlation = 0 # Begin with a value of 0
     
     for index in range(len(a)):
-        add_cross_correlation = a[index] * b[index]
-        cross_correlation += add_cross_correlation
+        add_correlation = a[index] * b[index]
+        correlation += add_correlation
         
-    return cross_correlation
+    return correlation
 
-print(f'Cross Correlation between Vectors A and B: {cross_correlation(a, b)}')
-print(f'Cross Correlation between Vectors A and C: {cross_correlation(a, c)}')
-print(f'Cross Correlation between Vectors B and C: {cross_correlation(b, c)}')
+print(f'Correlation between Vectors A and B: {correlation(a, b)}')
+print(f'Correlation between Vectors A and C: {correlation(a, c)}')
+print(f'Correlation between Vectors B and C: {correlation(b, c)}')
 
 
-# Cross correlation of trig functions to better visualize correlation
+# Correlation of trig functions to better visualize correlation
 
 time_step = 0.1 # Play around with the time step!
 phase_shift = 1 # Play around with the phase_shift of the second function!
@@ -93,7 +93,7 @@ ax[0].plot(time_series, cos_func)
 
 ax[1].plot(time_series, sin_func)
 
-fig.suptitle(f'Cross-Correlation: {cross_correlation(cos_func, sin_func)}')
+fig.suptitle(f'Correlation: {correlation(cos_func, sin_func)}')
 
 
            

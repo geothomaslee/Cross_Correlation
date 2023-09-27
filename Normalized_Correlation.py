@@ -28,7 +28,7 @@ ax[0].set_ylim((-1 * margin), margin)
 ax[1].plot(time_series, func_2)
 ax[1].set_ylim((-1 * margin), margin)
 
-def normalized_cross_correlation(a, b):
+def normalized_correlation(a, b):
     """
     Parameters
     ----------
@@ -37,37 +37,37 @@ def normalized_cross_correlation(a, b):
     b : np.array
         Y-values of the secod time-series stored in a numpy vector.
 
-    Returns normalized cross-correlation value as an integer or float.
+    Returns normalized correlation value as an integer or float.
     
-    Returns un-normalized cross-correlation value.
+    Returns un-normalized correlation value.
     -------
-    Normalized cross-correlation does conceptually the same thing as the
-    regular cross-correlation (see basic cross correlation for explanation) but
-    divides the cross-correlation by a normalizing factor. The normalizing
+    Normalized correlation does conceptually the same thing as the
+    regular correlation (see basic correlation for explanation) but
+    divides the correlation by a normalizing factor. The normalizing
     factor is calculated based on the power of the function so that two functions
     with the same shape but different powers give back a correlation that compares
     the shapes of the function, but doesn't care about the amplitude. The
-    normalized cross-correlation will always be between -1 and 1.
+    normalized correlation will always be between -1 and 1.
 
     """
-    cross_correlation = 0
+    correlation = 0
     norm_sum_a = 0
     norm_sum_b = 0
     for index in range(len(time_series)):
-        add_cross_correlation = a[index] * b[index]
+        add_correlation = a[index] * b[index]
         add_norm_sum_a = a[index] ** 2
         add_norm_sum_b = b[index] ** 2
         
-        cross_correlation += add_cross_correlation
+        correlation += add_correlation
         norm_sum_a += add_norm_sum_a
         norm_sum_b += add_norm_sum_b
     
     normalizing_factor = np.sqrt(norm_sum_a * norm_sum_b)
-    normalized_cross_correlation = cross_correlation / normalizing_factor
+    normalized_correlation = correlation / normalizing_factor
     
-    return normalized_cross_correlation, cross_correlation
+    return normalized_correlation, correlation
 
-ex_norm_cc, ex_cc= normalized_cross_correlation(func_1, func_2)
+ex_norm_cc, ex_cc= normalized_correlation(func_1, func_2)
 
-fig.suptitle(f'Normalized Cross-Correlation: {ex_norm_cc}, Unnormalized: {ex_cc}')
+fig.suptitle(f'Normalized Correlation: {ex_norm_cc}, Unnormalized: {ex_cc}')
 
