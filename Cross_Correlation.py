@@ -15,8 +15,8 @@ scaling_factor = 5
 # Set to 1 by default, but play around with this to see how the power of the
 # functions affects the correlation
 
-delta = 0.01 # Time-step of time-series, AKA instrument sampling rate
-window_length = 60 # Correlation length of the window in seconds
+delta = 1 # Time-step of time-series, AKA instrument sampling rate
+window_length = 3600 # Correlation length of the window in seconds
 
 # A good example of what real data may look like is a 3600 second window
 # with a delta of 0.01, representing an hour of data sampling at 100Hz
