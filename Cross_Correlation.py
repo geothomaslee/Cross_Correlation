@@ -15,9 +15,13 @@ scaling_factor = 5
 # Set to 1 by default, but play around with this to see how the power of the
 # functions affects the correlation
 
-delta = 0.1 # Time-step of time-series, AKA instrument sampling rate
+delta = 0.01 # Time-step of time-series, AKA instrument sampling rate
+window_length = 60 # Correlation length of the window in seconds
 
-time_series = np.arange(0, 10, delta)
+# A good example of what real data may look like is a 3600 second window
+# with a delta of 0.01, representing an hour of data sampling at 100Hz
+
+time_series = np.arange(0, window_length, delta)
 
 func_1 = np.cos(time_series) * scaling_factor
 func_2 = np.sin(time_series)
