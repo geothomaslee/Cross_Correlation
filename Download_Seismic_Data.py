@@ -128,10 +128,14 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
         if len(arg) <= 1:
             raise ValueError("Lists must have length greater than 1 for bulk download")
     
+    # Checks if more than one client has been fed into client
+    if type(arguments["client"]) != str:
+        raise TypeError('Client must be a string and can only handle one client per request')
+        
+    
     # For items inputted not as a list, we need to assume that we just want to
     # use that value for every trace. This creates a list with the same length
     # as the list variables for which every entry is the non-list input
-    
     arg_dict = {}
     for non_list_arg in non_list_args:
         temp_list = []
@@ -140,38 +144,54 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
        
         arg_dict[non_list_arg] = temp_list
         
+    # Putting the actual list variables into our new argument dictionary for
+    # The sake of consistency    
     for list_arg_key in list_args_keys:
         arg_dict[list_arg_key] = arguments[list_arg_key]
+    
+    UTC_Start_Time_List = []
+    UTC_End_Time_List = []
+    for time in arg_dict['starttime']:
+        UTC_Start_Time = UTCDateTime(time)
+        UTC_Start_Time_List.append(UTC_Start_Time)
+        
+        UTC_End_Time = UTC_Start_Time + timewindow
+        UTC_End_Time_List.append(UTC_End_Time)
+    
+    
+    
+    # Client shouldn't be a list so doing this is easiest fix
+    arg_dict['client'] = arguments['client']
+        
+    # Creating our internal client
+    client_int = Client(arg_dict['client'])
         
     print(arg_dict)
     
-    
+    """
     stream = client_int.get_waveforms_bulk(network=arg_dict[network], 
-                                           station=arg_dict[station]
-                                           location=arg_dict[location]
-                                           channel=arg_dict[channel]
+                                           station=arg_dict[station],
+                                           location=arg_dict[location],
+                                           channel=arg_dict[channel],
                                            starttime=arg_dict[starttime], 
                                            endtime=arg_dict[endtime])
     
-    return stream
 
-    """
     NOTES FOR WHEN WORKING LATER
-    
     Need to make every entry in starttime a UTCDateTime object
     Need to create endtime list and define it in arg_dict
-    Need to make sure every entry in client is a Client object
-    
+    Need to make sure every entry in client is a Client object DONE
     """
     
+    
 
-client_list = ["IRIS", "IRIS"]
-network_list = ["IU", "IU"]
+client = "IRIS"
+network = "IU"
 
-example_bulk_stream = bulk_download_seismic_data(client=client_list,
+example_bulk_stream = bulk_download_seismic_data(client=client,
                                                   starttime="2023-09-15T05:00:00.000",
                                                   timewindow=3600,
-                                                  network=network_list,
+                                                  network=network,
                                                   station="ANMO",
                                                   location="00",
                                                   channel="LH?")
