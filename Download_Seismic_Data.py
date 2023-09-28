@@ -102,7 +102,6 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
     """
     
     arguments = locals()
-    print(arguments)
     
     ""
     # Checks to see if any lists have been inputted
@@ -137,32 +136,34 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
     for non_list_arg in non_list_args:
         temp_list = []
         for i in range(base_len):
-            temp_list.append(non_list_arg)
+            temp_list.append(arguments[non_list_arg])
+       
+        arg_dict[non_list_arg] = temp_list
         
-        arg_dict[non_list_arg] = []
-        arg_dict[non_list_arg].append(temp_list)
+    for list_arg_key in list_args_keys:
+        arg_dict[list_arg_key] = arguments[list_arg_key]
         
-    for list_arg in list_args_keys:
-        arg_dict[list_arg] = []
-        arg_dict[list_arg].append(arguments[list_arg])
-        
-        
-    client_int = Client(client)
-    starttime_int =  UTCDateTime(starttime)
-    endtime = starttime_int + timewindow
-    
     print(arg_dict)
     
-    """
-    stream = client_int.get_waveforms_bulk(network=network_list, 
-                                           station=station_list, 
-                                           location=location_list, 
-                                           channel=channel_list, 
-                                           starttime_int=starttime_int_list, 
-                                           endtime_list)
+    
+    stream = client_int.get_waveforms_bulk(network=arg_dict[network], 
+                                           station=arg_dict[station]
+                                           location=arg_dict[location]
+                                           channel=arg_dict[channel]
+                                           starttime=arg_dict[starttime], 
+                                           endtime=arg_dict[endtime])
     
     return stream
+
     """
+    NOTES FOR WHEN WORKING LATER
+    
+    Need to make every entry in starttime a UTCDateTime object
+    Need to create endtime list and define it in arg_dict
+    Need to make sure every entry in client is a Client object
+    
+    """
+    
 
 client_list = ["IRIS", "IRIS"]
 network_list = ["IU", "IU"]
@@ -175,5 +176,4 @@ example_bulk_stream = bulk_download_seismic_data(client=client_list,
                                                   location="00",
                                                   channel="LH?")
                                     
-example_bulk_stream.plot()
     
