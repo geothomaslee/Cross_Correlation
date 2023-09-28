@@ -205,11 +205,11 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
 # Test inputs for example bulk stream
 client = "IRIS"
 network = "IU"
-station_list = ['ANMO', 'TUC']
+station_list = ['ANMO','TUC','RSSD']
 location = "00"
-channel = "LHZ"
-timewindow = 3600
-starttime = "2023-09-15T05:00:00.000"
+channel = "?HZ"
+timewindow = 60
+starttime = "2020-09-15T05:00:00.000"
 
 example_bulk_stream = bulk_download_seismic_data(client=client,
                                                   starttime=starttime,
@@ -218,7 +218,6 @@ example_bulk_stream = bulk_download_seismic_data(client=client,
                                                   station=station_list,
                                                   location=location,
                                                   channel=channel)
-
 example_bulk_stream.plot()
                                     
     
