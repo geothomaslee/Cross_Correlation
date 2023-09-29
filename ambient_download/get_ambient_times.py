@@ -4,6 +4,10 @@ Created on Thu Sep 28 18:27:43 2023
 
 @author: tlee4
 """
+from obspy.clients.fdsn import Client
+from obspy import UTCDateTime
+import pandas as pd
+import ambient_download
 
 def get_ambient_windows(starttime, time_window, time_length):
     """
@@ -24,7 +28,7 @@ def get_ambient_windows(starttime, time_window, time_length):
     starttime_int = UTCDateTime(starttime)
     
     time_list = [starttime_int]
-    num_windows = time_length / time_window
+    num_windows = int(time_length / time_window)
     print(num_windows)
     
     for i in range(num_windows - 1):
@@ -32,6 +36,3 @@ def get_ambient_windows(starttime, time_window, time_length):
         time_list.append(new_time)
     
     return time_list
-    
-test_ambient_windows = get_ambient_windows("2020-09-15T05:00:00.000", 60, 360)
-print(test_ambient_windows)
