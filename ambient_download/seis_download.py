@@ -36,6 +36,11 @@ def download_seismic_data(client, starttime, timewindow, network, station, locat
     See obspy.core.stream.Stream documentation for more info on how to work
     with stream objects
     ---------
+    This is best for when dealing with smaller amounts of data, but can be
+    needlessly cumbersome on the servers when dealing with a lot of separate
+    requests. See bulk_download_seismic_data for when dealing with a lot of
+    data that is coming in many different requests
+    ---------
     """
     client_int = Client(client)
     starttime_int =  UTCDateTime(starttime)
@@ -47,12 +52,13 @@ def download_seismic_data(client, starttime, timewindow, network, station, locat
     
     return stream
 
-test_stream = download_seismic_data(client="IRIS",
-                                    starttime="2023-09-15T05:00:00.000",
-                                    timewindow=3600,
-                                    network="IU",
-                                    station="ANMO",
-                                    location="00",
-                                    channel="LH?")
+# Plotting up a quick example to show how the script works
+example_stream = download_seismic_data(client="IRIS",
+                                       starttime="2023-09-15T05:00:00.000",
+                                       timewindow=3600,
+                                       network="IU",
+                                       station="ANMO",
+                                       location="00",
+                                       channel="LH?")
                                     
-test_stream.plot()
+example_stream.plot()
