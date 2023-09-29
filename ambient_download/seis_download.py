@@ -51,14 +51,3 @@ def download_seismic_data(client, starttime, timewindow, network, station, locat
                                       starttime_int, endtime)
     
     return stream
-
-# Plotting up a quick example to show how the script works
-example_stream = download_seismic_data(client="IRIS",
-                                       starttime="2023-09-15T05:00:00.000",
-                                       timewindow=3600,
-                                       network="IU",
-                                       station="ANMO",
-                                       location="00",
-                                       channel="LH?")
-                                    
-example_stream.plot()
