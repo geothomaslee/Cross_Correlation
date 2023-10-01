@@ -82,7 +82,6 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         day = start_datetime.day
         hour = start_datetime.hour
         minute = start_datetime.minute
-        second = start_datetime.minute
         
         start_time_formatted = f'{year}.{month}.{day}.T.{hour}.{minute}'
         
@@ -96,11 +95,9 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         if not os.path.isdir(sort_folder_path):
             os.makedirs(sort_folder_path)
         
-    
+        filename = f'{station}.{channel}.{start_time_formatted}.{format}'
         
-        #path = f'{main_folder}.{sort_folder}'
-        
-        #trace.write(f'./{folder}/{station}.{channel}.{start_time_formatted}.{format}')
+        trace.write(f'./{sort_folder_path}/{filename}')
     
         
         
