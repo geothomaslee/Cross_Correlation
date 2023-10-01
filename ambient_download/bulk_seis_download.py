@@ -42,10 +42,12 @@ def bulk_download_seismic_data(client, starttime, endtime, network, station, loc
     See obspy.core.stream.Stream documentation for more info on how to work
     with stream objects
     ---------
-    This is best for when dealing with smaller amounts of data, but can be
-    needlessly cumbersome on the servers when dealing with a lot of separate
-    requests. See bulk_download_seismic_data for when dealing with a lot of
-    data that is coming in many different requests
+    If you are downloading continuous data and are requesting separate, but 
+    consecutive, time windows, this module will combine all of them into one
+    trace. Thus, its use is somewhat limited for things like ambient noise
+    where you may want to download your correlation windows already cut instead
+    of cutting them yourself. However, it is still useful for many other
+    applications of downloading data.
     """
     
     arguments = locals()

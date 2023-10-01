@@ -17,6 +17,11 @@ def get_ambient_windows(starttime, time_window, time_length, delta):
         Desired window length as in integer in seconds.
     time_length : integer
         Overall time length as in integer in seconds.
+    delta : float or integer
+        The sampling rate of the instrument. The last data point needs to be
+        removed from each window so as to not have overlap, otherwise 
+        get_waveforms_bulk will automatically combine the separate windows into
+        one long trace, which is not what we want here.
 
     Returns
     -------
