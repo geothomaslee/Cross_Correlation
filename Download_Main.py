@@ -14,18 +14,17 @@ starttime = "2023-09-27T00:00:00.000"
 window_length = 60
 total_time =  360
 
-starttimes = get_ambient_windows(starttime, window_length, total_time)
+starttimes, endtimes = get_ambient_windows(starttime, window_length, total_time, 0.1)
 
 
 ambient_stream = bulk_download_seismic_data(client="IRIS",
                                             starttime=starttimes,
-                                            timewindow=window_length,
+                                            endtime=endtimes,
                                             network="IU",
                                             station="ANMO",
                                             location="00",
                                             channel="LHZ")
 
 print(ambient_stream)
-
 
     

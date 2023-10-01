@@ -8,7 +8,7 @@ from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 import pandas as pd
 
-def bulk_download_seismic_data(client, starttime, timewindow, network, station, location, channel):
+def bulk_download_seismic_data(client, starttime, endtime, network, station, location, channel):
     """
     client: string giving the name of the client - most likely IRIS. 
     See obspy.clients.fdsn documentation for more potential client sources.
@@ -96,12 +96,13 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
         arg_dict[list_arg_key] = arguments[list_arg_key]
     
     UTC_Start_Time_List = []
-    UTC_End_Time_List = []
     for time in arg_dict['starttime']:
         UTC_Start_Time = UTCDateTime(time)
         UTC_Start_Time_List.append(UTC_Start_Time)
-        
-        UTC_End_Time = UTC_Start_Time + timewindow
+    
+    UTC_End_Time_List = []
+    for time in arg_dict['endtime']:
+        UTC_End_Time = UTCDateTime(time)
         UTC_End_Time_List.append(UTC_End_Time)
         
     arg_dict['starttime'] = UTC_Start_Time_List
@@ -121,7 +122,6 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
     
     arg_df = pd.DataFrame.from_dict(arg_dict)
     arg_df = arg_df.drop(columns=['client'])
-    arg_df = arg_df.drop(columns=['timewindow'])
     
     bulk_list_names = ['network','station','location','channel','starttime','endtime']
     bulk_list_order = []
@@ -139,7 +139,7 @@ def bulk_download_seismic_data(client, starttime, timewindow, network, station, 
     for i in range(len(arg_df.index)):
         row = arg_df.loc[i,:].values.flatten().tolist()
         bulk.append(row)
-    
-    stream = client_int.get_waveforms_bulk(bulk)
+        
+        stream = client_int.get_waveforms_bulk(bulk)
     
     return stream
