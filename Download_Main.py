@@ -16,32 +16,30 @@ from ambient_download.save_stream import save_stream_traces
 init_time = time.perf_counter()
 
 starttime = "2023-09-27T00:00:00.000"
-window_length = 60
-total_time =  180
+window_length = 3600
+total_time = 10800
 
-starttimes, endtimes = get_ambient_windows(starttime, window_length, total_time, 1)
+starttimes, endtimes = get_ambient_windows(starttime, window_length, total_time, 0.0125)
 
 download_time = time.perf_counter()
 
-ambient_stream = bulk_download_seismic_data(client="IRIS",
-                                            starttime=starttimes,
-                                            endtime=endtimes,
-                                            network="IU",
-                                            station="ANMO",
-                                            location="00",
-                                            channel="LHZ")
+station_list = ['ANMO', 'TUC']
 
-print(ambient_stream)
-
-save_time = time.perf_counter()
-
-save_stream_traces(stream=ambient_stream, sort_method="station",
-                   force_overwrite=True)
+for station in station_list: 
+    ambient_stream = bulk_download_seismic_data(client="IRIS",
+                                                starttime=starttimes,
+                                                endtime=endtimes,
+                                                network="IU",
+                                                station=station,
+                                                location="00",
+                                                channel="BHZ")
+    
+    save_stream_traces(stream=ambient_stream, sort_method="station",
+                       force_overwrite=False,adding_data=False)
 
 final_time = time.perf_counter()
 
 print(f'Time to load module: {init_time - module_load_time}')
 print(f'Time to initialize: {download_time - init_time}')
-print(f'Time to download: {save_time - download_time}')
-print(f'Time to save: {final_time - save_time}')
+print(f'Time to download and save: {final_time - download_time}')
     

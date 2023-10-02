@@ -14,7 +14,7 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
                        use_network=True,use_station=True,
                        use_location=False,use_channel=True,
                        use_starttime=True,use_endtime=False,
-                       force_overwrite=False):
+                       force_overwrite=False, adding_data = True):
 
     """
     Parameters
@@ -39,6 +39,12 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         If set to True, will forcibly delete any data that exists in the main
         folder before saving new data.
         
+    adding_data : bool, optional
+        If set to true, will add to the main data folder and removes the 
+        error message thrown when the folder already has data in it. If both
+        adding_data and force_ovewrite are set true, then an error will be
+        thrown because these are inherently in conflict.
+        
     use_starttime : bool, optional
         Include start time of the trace in the file name? The default is True.
     use_endtime : bool, optional
@@ -60,11 +66,16 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
     
     if type(stream.count()) != int:
         raise TypeError('Input stream is almost certainly not an Obspy stream')
+        
+    if(force_overwrite == True and adding_data == True):
+        raise ValueError('force_overwrite and adding_data cannot both be true')
     
     if os.path.isdir(main_folder):
         if len(os.listdir(main_folder)) != 0:
             if force_overwrite:
                 shutil.rmtree(main_folder)
+            elif adding_data:
+                pass
             else:
                 raise RuntimeError('Data directory is not empty and may contain other data')
     else:
