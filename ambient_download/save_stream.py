@@ -11,9 +11,9 @@ import os
 
 def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
                        sort_method="station",
-                       use_starttime=True,use_endtime=False,
                        use_network=True,use_station=True,
                        use_location=False,use_channel=True,
+                       use_starttime=True,use_endtime=False,
                        force_overwrite=False):
 
     """
@@ -76,6 +76,16 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
     if sort_method not in acceptable_sort_method_list:
         raise ValueError('Invalid sort method. Use help to see valid sort methods')
     
+    arguments = locals()
+    name_use = {}
+    
+    for key in arguments:
+        value = arguments[key]
+        if type(value) == bool:
+            if "use" in key:
+                if value:
+                    name_use[key] = ""
+    
     for trace_index in range(num_traces):
         trace = stream[trace_index]
         
@@ -94,7 +104,30 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         hour = start_datetime.hour
         minute = start_datetime.minute
         
+        if "use_endtime" in name_use:
+            end_datetime = endtime.datetime
+            year = end_datetime.year
+            month = end_datetime.month
+            day = end_datetime.day
+            hour = end_datetime.hour
+            minute = end_datetime.minute
+            
+            end_time_formatted = f'{year}.{month}.{day}.T.{hour}.{minute}'
+            
+        
         start_time_formatted = f'{year}.{month}.{day}.T.{hour}.{minute}'
+        
+        filename = ""
+        for name_key in name_use:
+            if name_key == "use_starttime":
+                filename += start_time_formatted
+            else:
+                meta_name = str(name_key)[4:]
+                filename += trace.meta[meta_name]
+                filename += "."
+                
+        print(filename)
+        
         
         if sort_method == "starttime":
             sort_folder = start_time_formatted
