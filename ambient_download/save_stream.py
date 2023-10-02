@@ -125,9 +125,6 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
                 meta_name = str(name_key)[4:]
                 filename += trace.meta[meta_name]
                 filename += "."
-                
-        print(filename)
-        
         
         if sort_method == "starttime":
             sort_folder = start_time_formatted
