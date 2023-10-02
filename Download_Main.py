@@ -28,6 +28,6 @@ ambient_stream = bulk_download_seismic_data(client="IRIS",
 
 print(ambient_stream)
 
-save_stream_traces(ambient_stream,
-                   sort_method="station")
+save_stream_traces(stream=ambient_stream, sort_method="station",
+                   force_overwrite=True)
     

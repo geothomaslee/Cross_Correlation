@@ -5,15 +5,16 @@ Created on Sun Oct  1 14:40:59 2023
 @author: tlee4
 """
 
-#import obspy
 #import glob as glob
+import shutil
 import os
 
 def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
                        sort_method="station",
                        use_starttime=True,use_endtime=False,
                        use_network=True,use_station=True,
-                       use_location=False,use_channel=True,):
+                       use_location=False,use_channel=True,
+                       force_overwrite=False):
 
     """
     Parameters
@@ -34,6 +35,10 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         folder. Method must be either starttime, endtime, network, station,
         location, or channel.
         
+    force_overwrite : bool, optional
+        If set to True, will forcibly delete any data that exists in the main
+        folder before saving new data.
+        
     use_starttime : bool, optional
         Include start time of the trace in the file name? The default is True.
     use_endtime : bool, optional
@@ -53,9 +58,15 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
     
     num_traces = len(stream)
     
+    if type(stream.count()) != int:
+        raise TypeError('Input stream is almost certainly not an Obspy stream')
+    
     if os.path.isdir(main_folder):
         if len(os.listdir(main_folder)) != 0:
-            raise RuntimeError('Data directory is not empty and may contain other data')
+            if force_overwrite:
+                shutil.rmtree(main_folder)
+            else:
+                raise RuntimeError('Data directory is not empty and may contain other data')
     else:
         os.makedirs(main_folder)
         
