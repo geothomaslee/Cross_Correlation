@@ -4,42 +4,45 @@ Created on Thu Sep 28 18:40:27 2023
 
 @author: tlee4
 """
-import time
 
-module_load_time = time.perf_counter()
-
-from ambient_download.bulk_seis_download import bulk_download_seismic_data
-#from ambient_download.seis_download import download_seismic_data
-from ambient_download.get_ambient_times import get_ambient_windows
-from ambient_download.save_stream import save_stream_traces
-
-init_time = time.perf_counter()
-
-starttime = "2023-09-27T00:00:00.000"
-window_length = 3600
-total_time = 10800
-
-starttimes, endtimes = get_ambient_windows(starttime, window_length, total_time, 0.0125)
-
-download_time = time.perf_counter()
-
-station_list = ['ANMO', 'TUC']
-
-for station in station_list: 
-    ambient_stream = bulk_download_seismic_data(client="IRIS",
-                                                starttime=starttimes,
-                                                endtime=endtimes,
-                                                network="IU",
-                                                station=station,
-                                                location="00",
-                                                channel="BHZ")
+def main():
+    import time
+    module_load_time = time.perf_counter()
     
-    save_stream_traces(stream=ambient_stream, sort_method="station",
-                       force_overwrite=False,adding_data=False)
-
-final_time = time.perf_counter()
-
-print(f'Time to load module: {init_time - module_load_time}')
-print(f'Time to initialize: {download_time - init_time}')
-print(f'Time to download and save: {final_time - download_time}')
+    from ambient_download.bulk_seis_download import bulk_download_seismic_data
+    from ambient_download.get_ambient_times import get_ambient_windows
+    from ambient_download.save_stream import save_stream_traces
+    
+    
+    init_time = time.perf_counter()
+    
+    starttime = "2023-09-27T00:00:00.000"
+    window_length = 3600
+    total_time = 86400
+    
+    starttimes, endtimes = get_ambient_windows(starttime, window_length, total_time, 0.0125)
+    station_list = ['ANMO', 'TUC']
+    
+    download_time = time.perf_counter()
+    
+    for station in station_list: 
+        ambient_stream = bulk_download_seismic_data(client="IRIS",
+                                                    starttime=starttimes,
+                                                    endtime=endtimes,
+                                                    network="IU",
+                                                    station=station,
+                                                    location="00",
+                                                    channel="BHZ")
+        
+        save_stream_traces(stream=ambient_stream, sort_method="station",
+                           force_overwrite=False,adding_data=True)
+    
+    final_time = time.perf_counter()
+    
+    print(f'Time to load module: {init_time - module_load_time}')
+    print(f'Time to initialize: {download_time - init_time}')
+    print(f'Time to download and save: {final_time - download_time}')
+    
+if __name__ == '__main__':
+    main()
     
