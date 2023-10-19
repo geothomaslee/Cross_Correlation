@@ -40,13 +40,16 @@ def download_trace(client,starttime, timewindow, network, station,location, chan
     
     if type(timewindow) == str:
         if timewindow == "day":
-            timewindow_fin = 86400
+            timewindow_int = 86400
+            endtime = starttime_int + timewindow_int
         if timewindow == "hour":
-            timewindow_fin = "3600"
+            timewindow_int = 3600
+            endtime = starttime_int + timewindow_int
         else:
-            endtime = timewindow_fin
+            endtime = timewindow # If it's a string that's not an amount of time
+                                 # Then this assumes it's the end time
     elif type(timewindow) == int:
-        endtime = starttime_int + timewindow_fin
+        endtime = starttime_int + timewindow
     else:
         raise TypeError('Timewindow must be an integer or string specifying the end time')
     
