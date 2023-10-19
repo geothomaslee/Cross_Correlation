@@ -25,8 +25,10 @@ def get_ambient_windows(starttime, time_window, time_length, delta):
 
     Returns
     -------
-    ambient_time_windows : list
-        List of starttimes for the ambient time windows
+    start_time_list : list
+        List of start times for the ambient windows
+    end_time_list : list
+        List of end times for the ambient windows
     """
     starttime_int = UTCDateTime(starttime)
     
