@@ -31,6 +31,7 @@ def cut_traces_into_windows(trace, windowlength, save=False):
     delta = trace.stats['delta']
     npts = trace.stats['npts']
     
+    # Checks to see if total time in trace is divisible by desired window length
     num_windows, window_remainder = divide_with_remainder(npts, (windowlength / delta))
     
     if window_remainder != 0:
@@ -40,10 +41,14 @@ def cut_traces_into_windows(trace, windowlength, save=False):
         print(f'Length of final window: {window_remainder * delta}')
         
         endtime_int = endtime - (window_remainder * delta)
+        num_windows_int = num_windows + 1
     else:
         endtime_int = endtime
+        num_windows_int = num_windows
 
+    # Calculates total time length of trace
     total_time = endtime_int - starttime + delta
+    print(f'Cutting {total_time} seconds of data into {num_windows} windows')
     
     start_time_list, end_time_list = get_ambient_windows(starttime = starttime,
                                                          time_window = windowlength,
@@ -56,9 +61,7 @@ def cut_traces_into_windows(trace, windowlength, save=False):
     
     return start_time_list, end_time_list
 
-start_time_list, end_time_list = cut_traces_into_windows(test_trace,600)
-print(end_time_list)
-    
+start_time_list, end_time_list = cut_traces_into_windows(test_trace,60)
     
     
     
