@@ -6,21 +6,8 @@ Created on Thu Oct 19 12:47:52 2023
 """
 
 from get_ambient_times import get_ambient_windows
-from download_trace import download_trace
 import obspy
 import math
-import time
-
-test_stream = download_trace(client="IRIS",
-                             starttime="2023-06-06T00:00:00",
-                             timewindow=86400,
-                             network="IU",
-                             station="ANMO",
-                             location="00",
-                             channel="BHZ")
-
-test_trace = test_stream[0]
-test_trace.plot()
 
 def divide_with_remainder(a, b):
     whole = math.floor(a / b)
@@ -28,10 +15,20 @@ def divide_with_remainder(a, b):
     
     return whole, remainder
 
-def cut_traces_into_windows(trace, windowlength, save=False):
-    
-    window_calc_time = time.perf_counter()
-    
+def cut_traces_into_windows(trace, windowlength):
+    """
+    Parameters
+    ----------
+    trace : obspy.core.trace.Trace
+        The ObsPy trace that you want to cut.
+    windowlength : int
+        length, in seconds, of the desired cut window.
+
+    Returns
+    -------
+    int_func_stream : obspy.core.stream.Stream
+        An ObsPy stream containing all of the cut traces
+    """
     starttime = trace.stats['starttime']
     endtime = trace.stats['endtime']
     delta = trace.stats['delta']
@@ -69,10 +66,6 @@ def cut_traces_into_windows(trace, windowlength, save=False):
         start_time_list.append(end_time_list[-1])
         end_time_list.append(end_time_list[-1] + (window_remainder * delta))
        
-    print(f'Window calculation time: {time.perf_counter() - window_calc_time}')
-    
-    cut_time = time.perf_counter()
-    
     int_func_stream = obspy.core.stream.Stream()
     
     for i in range(num_windows):
@@ -84,14 +77,5 @@ def cut_traces_into_windows(trace, windowlength, save=False):
         
         int_func_stream.append(cut_trace)
         
-    print(f'Cut time: {time.perf_counter() - cut_time}')
-        
     return int_func_stream
-        
-cut_stream = cut_traces_into_windows(test_trace,3600)
     
-    
-    
-    
-    
-
