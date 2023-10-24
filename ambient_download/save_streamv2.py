@@ -80,8 +80,8 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         
 
 test_stream = download_trace(client="IRIS",
-                             starttime="2023-06-06T00:00:000",
-                             timewindow="3600",
+                             starttime="2023-06-06T00:00:00.000",
+                             timewindow=3600,
                              network="IU",
                              station="ANMO",
                              location="00",

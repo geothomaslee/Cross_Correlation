@@ -48,6 +48,8 @@ def download_trace(client,starttime, timewindow, network, station,location, chan
         else:
             endtime = timewindow # If it's a string that's not an amount of time
                                  # Then this assumes it's the end time
+            print('Warning: string given for time_window, now assuming given string is the end time')
+                                 
     elif type(timewindow) == int:
         endtime = starttime_int + timewindow
     else:
