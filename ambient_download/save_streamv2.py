@@ -11,8 +11,8 @@ import os
 
 from download_trace import download_trace
 
-def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
-                       sort_method=None, force_overwrite=False):
+def save_stream(stream,main_folder="./Downloaded_Traces",format="MSEED",
+                sort_method=None, force_overwrite=False):
     
     if sort_method == None:
         raise ValueError('A list of sorting methods must be given')
@@ -43,7 +43,8 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         
     acceptable_sort_method_list = ["starttime", "endtime", 
                                    "network", "station",
-                                   "location", "channel"]
+                                   "location", "channel",
+                                   "julday","year"]
     
     
     if all(method in acceptable_sort_method_list for method in sort_method_list):
@@ -62,57 +63,28 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         starttime = trace.meta['starttime']
         endtime = trace.meta['endtime']
         
-        """
-        start_datetime = starttime.datetime
-        
-        year = start_datetime.year
-        month = start_datetime.month
-        day = start_datetime.day
-        hour = start_datetime.hour
-        minute = start_datetime.minute
-        """
+        julday = str(starttime.julday)
+        year = starttime.year
+        hour = starttime.hour
         
         trace_directory = f'{main_folder}./'
-        for sub_dir in sort_method_list:
-            trace_directory.append(sub_dir)
+        
+        # Creating the name of the sorting folder
+        for i, sub_dir in enumerate(sort_method_list):
+            sub_dir_val = locals()[sub_dir]
+            # Pulls the value of the variable because name is given as string
+            if i == (len(sort_method_list) -1): # Checks to not add ./ to last folder
+                trace_directory = trace_directory + sub_dir_val
+            else:
+                trace_directory = trace_directory + sub_dir_val + '/'
                 
-        print(trace_directory)
-        
-
-test_stream = download_trace(client="IRIS",
-                             starttime="2023-06-06T00:00:00.000",
-                             timewindow=3600,
-                             network="IU",
-                             station="ANMO",
-                             location="00",
-                             channel="BHZ")
-    
-    
-test_sort_list = ['station','network']
-save_stream_traces(stream=test_stream,
-                   sort_method = test_sort_list)
-        
-        
-"""
-        if sort_method == "starttime":
-            sort_folder = start_time_formatted
+        if os.path.isdir(trace_directory):
+            pass
         else:
-            sort_folder = trace.meta[sort_method]
+            os.makedirs(trace_directory)
+                
+        file_name = f'{network}.{station}.{year}.{julday}.{hour}.{format}'
+        file_path_name = trace_directory + '/' + file_name
             
-        sort_folder_path = f'{main_folder}/{sort_folder}'
-        
-        if not os.path.isdir(sort_folder_path):
-            os.makedirs(sort_folder_path)
-        
-        filename = f'{station}.{channel}.{start_time_formatted}.{format}'
-        
-        trace.write(f'./{sort_folder_path}/{filename}')
-"""
-        
-       
-        
-        
-        
-        
-        
-        
+        trace.write(file_path_name,format=format)
+
