@@ -10,7 +10,7 @@ import shutil
 import os
 
 def save_stream(stream,main_folder="./Downloaded_Traces",format="MSEED",
-                sort_method=None, force_overwrite=False):
+                sort_method=None, force_overwrite=False,adding_data=False):
     
     if sort_method == None:
         raise ValueError('A list of sorting methods must be given')
@@ -34,6 +34,8 @@ def save_stream(stream,main_folder="./Downloaded_Traces",format="MSEED",
         if len(os.listdir(main_folder)) != 0:
             if force_overwrite:
                 shutil.rmtree(main_folder)
+            elif adding_data:
+                pass
             else:
                 raise RuntimeError('Data directory is not empty and may contain other data')
     else: # Creates the directory folder if

@@ -116,6 +116,8 @@ def cut_traces_into_windows(trace, windowlength):
     if window_remainder != 0:
         start_time_list.append(end_time_list[-1])
         end_time_list.append(end_time_list[-1] + (window_remainder * delta))
+        
+    print('Successfully calculated cut windows, cutting now')
        
     int_func_stream = obspy.core.stream.Stream()
     
