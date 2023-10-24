@@ -9,8 +9,6 @@ Created on Sun Oct  1 14:40:59 2023
 import shutil
 import os
 
-from download_trace import download_trace
-
 def save_stream(stream,main_folder="./Downloaded_Traces",format="MSEED",
                 sort_method=None, force_overwrite=False):
     
