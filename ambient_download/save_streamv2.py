@@ -62,8 +62,8 @@ def save_stream(stream,main_folder="./Downloaded_Traces",format="MSEED",
         endtime = trace.meta['endtime']
         
         julday = str(starttime.julday)
-        year = starttime.year
-        hour = starttime.hour
+        year = str(starttime.year)
+        hour = str(starttime.hour)
         
         trace_directory = f'{main_folder}./'
         

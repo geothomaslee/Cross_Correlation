@@ -11,13 +11,14 @@ from ambient_download.save_streamv2 import save_stream
 
 
 def main():
+    
     stream = download_trace(client="IRIS",
                             network="IU",
                             station="ANMO",
                             location="00",
                             channel="BHZ",
                             starttime="2023-06-06T00:00:00.000",
-                            timewindow = 86400)
+                            timewindow = 864000)
     
     cut_stream = cut_traces_into_windows(stream[0],3600)
     
