@@ -9,10 +9,11 @@ from get_ambient_times import get_ambient_windows
 from download_trace import download_trace
 import obspy
 import math
+import time
 
 test_stream = download_trace(client="IRIS",
                              starttime="2023-06-06T00:00:00",
-                             timewindow=359,
+                             timewindow="day",
                              network="IU",
                              station="ANMO",
                              location="00",
@@ -28,6 +29,9 @@ def divide_with_remainder(a, b):
     return whole, remainder
 
 def cut_traces_into_windows(trace, windowlength, save=False):
+    
+    window_calc_time = time.perf_counter()
+    
     starttime = trace.stats['starttime']
     endtime = trace.stats['endtime']
     delta = trace.stats['delta']
@@ -64,15 +68,26 @@ def cut_traces_into_windows(trace, windowlength, save=False):
     if window_remainder != 0:
         start_time_list.append(end_time_list[-1])
         end_time_list.append(end_time_list[-1] + (window_remainder * delta))
-        
+       
+    print(f'Window calculation time: {time.perf_counter() - window_calc_time}')
+    
+    cut_time = time.perf_counter()
+    
     int_func_stream = obspy.core.stream.Stream()
     
     for i in range(num_windows):
         cut_start = start_time_list[i]
         cut_end = end_time_list[i]
+        cut_trace = trace.copy()
         
-    
-
+        cut_trace.trim(cut_start,cut_end)
+        
+        int_func_stream.append(cut_trace)
+        
+    print(f'Cut time: {time.perf_counter() - cut_time}')
+        
+    return int_func_stream
+        
 cut_stream = cut_traces_into_windows(test_trace,60)
     
     
