@@ -13,7 +13,7 @@ import time
 
 test_stream = download_trace(client="IRIS",
                              starttime="2023-06-06T00:00:00",
-                             timewindow="day",
+                             timewindow=86400,
                              network="IU",
                              station="ANMO",
                              location="00",
@@ -88,7 +88,7 @@ def cut_traces_into_windows(trace, windowlength, save=False):
         
     return int_func_stream
         
-cut_stream = cut_traces_into_windows(test_trace,60)
+cut_stream = cut_traces_into_windows(test_trace,3600)
     
     
     
