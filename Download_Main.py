@@ -14,32 +14,32 @@ import obspy
 
 def main():
     
-    days = 15
+    days = 3
     start_day = UTCDateTime("2023-06-06T00:00:00.000")
     
     stream = obspy.core.stream.Stream()
     
     for day in range(days):
-        starttime = start_day + (15*86400)
+        int_start_time = start_day + (15*86400)
         current_stream = download_trace(client="IRIS",
                                         network="IU",
                                         station="ANMO",
                                         location="00",
                                         channel="BHZ",
-                                        starttime=starttime,
+                                        starttime=int_start_time,
                                         timewindow = 86400)
-        stream.append(current_stream)
+        stream.append(current_stream[0])
     
     print('Successfully downloaded data')
     
-    for trace in range(len(stream)):
-        cut_stream = cut_traces_into_windows(trace, 3600)
+    for i, trace in enumerate(stream):
+        print(i)
+        cut_stream = cut_traces_into_windows(trace=trace,windowlength=3600)
         
         sort_method_list = ['station','year','julday']
         
         save_stream(stream=cut_stream,sort_method=sort_method_list,adding_data=True)
-    
-    print('Successfully saved traces')
+        print('Successfully saved traces')
     
 if __name__ == '__main__':
     main()

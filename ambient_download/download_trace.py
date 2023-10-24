@@ -36,7 +36,11 @@ def download_trace(client,starttime, timewindow, network, station,location, chan
         ObsPy stream object which should only contain one trace
     """
     client_int = Client(client)
-    starttime_int =  UTCDateTime(starttime)
+    
+    if type(starttime) == str:
+        starttime_int =  UTCDateTime(starttime)
+    else:
+        starttime_int = starttime
     
     if type(timewindow) == str:
         if timewindow == "day":
