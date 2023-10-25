@@ -7,7 +7,7 @@ Created on Thu Sep 28 18:40:27 2023
 
 from ambient_download.download_trace import download_trace
 from ambient_download.cut_data import cut_traces_into_windows
-from ambient_download.save_streamv2 import save_stream
+from ambient_download.save_stream import save_stream
 import obspy
 import time
 
