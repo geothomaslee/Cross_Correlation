@@ -11,18 +11,17 @@ from ambient_download.save_streamv2 import save_stream
 from obspy import UTCDateTime
 import obspy
 import time
+from tqdm import tqdm
 
 
 def main():
     
-    days = 365
-    start_day = UTCDateTime("2022-06-06T00:00:00.000")
+    starttime = "2022-06-06T00:00:00.000"
     
     stream = obspy.core.stream.Stream()
     
-    download_start_time = time.perf_counter()
-    
-    for day in range(days):
+    """
+    for day in tqdm(range(days)):
         int_start_time = start_day + (day*86400)
         current_stream = download_trace(client="IRIS",
                                         network="IU",
@@ -32,21 +31,26 @@ def main():
                                         starttime=int_start_time,
                                         timewindow = 86400)
         stream.append(current_stream[0])
+    """
+    stream = download_trace(client="IRIS",
+                           network="IU",
+                           station="ANMO",
+                           location="00",
+                           channel="BHZ",
+                           starttime=starttime,
+                           timewindow = 86400*20)
     
-    print(f'Successfully downloaded data in {time.perf_counter() - download_start_time} seconds')
-    
-    cut_start_time = time.perf_counter()
     
     for i, trace in enumerate(stream):
         print(i)
         cut_stream = cut_traces_into_windows(trace=trace,windowlength=3600)
         
-        sort_method_list = ['station','year','julday']
+        sort_method_list = ['station','julday']
         
         save_stream(stream=cut_stream,sort_method=sort_method_list,adding_data=True)
         print('Successfully saved traces')
+        cut_stream.clear()
     
-    print(f'Successfully cut and saved data with an average time of {(time.perf_counter() - cut_start_time) / days} seconds per day')
 if __name__ == '__main__':
     main()
     

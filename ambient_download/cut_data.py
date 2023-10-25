@@ -124,10 +124,7 @@ def cut_traces_into_windows(trace, windowlength):
     for i in range(num_windows):
         cut_start = start_time_list[i]
         cut_end = end_time_list[i]
-        cut_trace = trace.copy()
-        
-        cut_trace.trim(cut_start,cut_end)
-        
+        cut_trace = trace.slice(cut_start,cut_end)
         int_func_stream.append(cut_trace)
         
     return int_func_stream
