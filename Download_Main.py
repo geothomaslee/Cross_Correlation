@@ -15,8 +15,8 @@ import time
 
 def main():
     
-    days = 10
-    start_day = UTCDateTime("2023-06-06T00:00:00.000")
+    days = 365
+    start_day = UTCDateTime("2022-06-06T00:00:00.000")
     
     stream = obspy.core.stream.Stream()
     
@@ -33,7 +33,7 @@ def main():
                                         timewindow = 86400)
         stream.append(current_stream[0])
     
-    print(f'Successfully downloaded data in {time.perf_counter - download_start_time} seconds')
+    print(f'Successfully downloaded data in {time.perf_counter() - download_start_time} seconds')
     
     cut_start_time = time.perf_counter()
     
