@@ -34,19 +34,20 @@ def main():
     
     stream = download_trace(client="IRIS",
                            network="IU",
-                           station="ANMO",
+                           station="TUC",
                            location="00",
                            channel="BHZ",
                            starttime=starttime,
-                           timewindow = 86400*365)
+                           timewindow = 86400)
     
-    print('Successfully downloaded data in {time.perf_counter() - test_time} seconds')
+    print(f'Successfully downloaded data in {time.perf_counter() - test_time} seconds')
     
     cut_stream = cut_traces_into_windows(trace=stream[0],windowlength=3600)
     
-    sort_method_list = ['station','year''julday']
+    sort_method_list = ['station','year','julday']
     
-    save_stream(stream=cut_stream,sort_method=sort_method_list,adding_data=True)
+    save_stream(stream=cut_stream,main_folder='../../Downloaded_Traces',
+                sort_method=sort_method_list, adding_data=True)
     print('Successfully saved traces')
     cut_stream.clear()
     
