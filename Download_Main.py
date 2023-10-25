@@ -8,11 +8,8 @@ Created on Thu Sep 28 18:40:27 2023
 from ambient_download.download_trace import download_trace
 from ambient_download.cut_data import cut_traces_into_windows
 from ambient_download.save_streamv2 import save_stream
-from obspy import UTCDateTime
 import obspy
 import time
-from tqdm import tqdm
-
 
 def main():
     
@@ -32,24 +29,26 @@ def main():
                                         timewindow = 86400)
         stream.append(current_stream[0])
     """
+    
+    test_time = time.perf_counter()
+    
     stream = download_trace(client="IRIS",
                            network="IU",
                            station="ANMO",
                            location="00",
                            channel="BHZ",
                            starttime=starttime,
-                           timewindow = 86400*20)
+                           timewindow = 86400*365)
     
+    print('Successfully downloaded data in {time.perf_counter() - test_time} seconds')
     
-    for i, trace in enumerate(stream):
-        print(i)
-        cut_stream = cut_traces_into_windows(trace=trace,windowlength=3600)
-        
-        sort_method_list = ['station','julday']
-        
-        save_stream(stream=cut_stream,sort_method=sort_method_list,adding_data=True)
-        print('Successfully saved traces')
-        cut_stream.clear()
+    cut_stream = cut_traces_into_windows(trace=stream[0],windowlength=3600)
+    
+    sort_method_list = ['station','year''julday']
+    
+    save_stream(stream=cut_stream,sort_method=sort_method_list,adding_data=True)
+    print('Successfully saved traces')
+    cut_stream.clear()
     
 if __name__ == '__main__':
     main()
