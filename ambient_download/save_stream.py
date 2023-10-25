@@ -9,67 +9,27 @@ Created on Sun Oct  1 14:40:59 2023
 import shutil
 import os
 
-def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
-                       sort_method="station",
-                       use_network=True,use_station=True,
-                       use_location=False,use_channel=True,
-                       use_starttime=True,use_endtime=False,
-                       force_overwrite=False, adding_data = True):
-
-    """
-    Parameters
-    ----------
-    stream : obspy.core.stream.Stream
-        Obspy Stream containing the traces you wish to download.
-        
-    folder : string, optional
-        The path of the main data folder that will contain your data.
-        
-        The default is "./Downloaded_Traces".
-        
-    format : string, optional
-        File type for saved data. The default is MSEED.
-        
-    sort_method : string, optional
-        Method for sorting the files into subdirectories within the main data
-        folder. Method must be either starttime, endtime, network, station,
-        location, or channel.
-        
-    force_overwrite : bool, optional
-        If set to True, will forcibly delete any data that exists in the main
-        folder before saving new data.
-        
-    adding_data : bool, optional
-        If set to true, will add to the main data folder and removes the 
-        error message thrown when the folder already has data in it. If both
-        adding_data and force_ovewrite are set true, then an error will be
-        thrown because these are inherently in conflict.
-        
-    use_starttime : bool, optional
-        Include start time of the trace in the file name? The default is True.
-    use_endtime : bool, optional
-        Include the end time in the file name?. The default is False.
-    use_network : bool, optional
-        Include the network in the file name? The default is True.
-    use_station : bool, optional
-        Include the station in the file name? The default is True.
-    use_location: bool, optional
-        Include the channel location in the file name? The default is False.
-    use_channel: bool, optional
-        Include the channel in the file name> The default is True.
-
-    Returns
-    -------
-    """
+def save_stream(stream,main_folder="./Downloaded_Traces",format="MSEED",
+                sort_method=None, force_overwrite=False,adding_data=False):
+    
+    if sort_method == None:
+        raise ValueError('A list of sorting methods must be given')
     
     num_traces = len(stream)
     
+    # Checks if input is a stream
     if type(stream.count()) != int:
         raise TypeError('Input stream is almost certainly not an Obspy stream')
         
-    if(force_overwrite == True and adding_data == True):
-        raise ValueError('force_overwrite and adding_data cannot both be true')
+    if type(sort_method) == list:
+        sort_method_list = sort_method
+    elif type(sort_method) == str:
+        sort_method_list = [sort_method]
+    else:
+        raise TypeError('Expected list of strings, or single string')
     
+    # Checks if data directory is empty, and raises an error if it isn't. If 
+    # force_overwrite is True, then will delete the data directory
     if os.path.isdir(main_folder):
         if len(os.listdir(main_folder)) != 0:
             if force_overwrite:
@@ -78,28 +38,24 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
                 pass
             else:
                 raise RuntimeError('Data directory is not empty and may contain other data')
-    else:
+    else: # Creates the directory folder if
         os.makedirs(main_folder)
         
     acceptable_sort_method_list = ["starttime", "endtime", 
                                    "network", "station",
-                                   "location", "channel"]
-    if sort_method not in acceptable_sort_method_list:
-        raise ValueError('Invalid sort method. Use help to see valid sort methods')
+                                   "location", "channel",
+                                   "julday","year"]
     
-    arguments = locals()
-    name_use = {}
     
-    for key in arguments:
-        value = arguments[key]
-        if type(value) == bool:
-            if "use" in key:
-                if value:
-                    name_use[key] = ""
-    
+    if all(method in acceptable_sort_method_list for method in sort_method_list):
+        pass
+    else:
+        raise ValueError('Invalid sort method included in sort_method. See help for acceptable methods')
+     
     for trace_index in range(num_traces):
         trace = stream[trace_index]
         
+        # Pulls some basic metadata from the trace
         station = trace.meta['station']
         network = trace.meta['network']
         location = trace.meta['location']
@@ -107,56 +63,28 @@ def save_stream_traces(stream,main_folder="./Downloaded_Traces",format="mseed",
         starttime = trace.meta['starttime']
         endtime = trace.meta['endtime']
         
-        start_datetime = starttime.datetime
+        julday = str(starttime.julday)
+        year = str(starttime.year)
+        hour = str(starttime.hour)
         
-        year = start_datetime.year
-        month = start_datetime.month
-        day = start_datetime.day
-        hour = start_datetime.hour
-        minute = start_datetime.minute
+        trace_directory = f'{main_folder}./'
         
-        if "use_endtime" in name_use:
-            end_datetime = endtime.datetime
-            year = end_datetime.year
-            month = end_datetime.month
-            day = end_datetime.day
-            hour = end_datetime.hour
-            minute = end_datetime.minute
-            
-            end_time_formatted = f'{year}.{month}.{day}.T.{hour}.{minute}'
-            
-        
-        start_time_formatted = f'{year}.{month}.{day}.T.{hour}.{minute}'
-        
-        filename = ""
-        for name_key in name_use:
-            if name_key == "use_starttime":
-                filename += start_time_formatted
+        # Creating the name of the sorting folder
+        for i, sub_dir in enumerate(sort_method_list):
+            sub_dir_val = locals()[sub_dir]
+            # Pulls the value of the variable because name is given as string
+            if i == (len(sort_method_list) -1): # Checks to not add ./ to last folder
+                trace_directory = trace_directory + sub_dir_val
             else:
-                meta_name = str(name_key)[4:]
-                filename += trace.meta[meta_name]
-                filename += "."
-        
-        if sort_method == "starttime":
-            sort_folder = start_time_formatted
+                trace_directory = trace_directory + sub_dir_val + '/'
+                
+        if os.path.isdir(trace_directory):
+            pass
         else:
-            sort_folder = trace.meta[sort_method]
+            os.makedirs(trace_directory)
+                
+        file_name = f'{network}.{station}.{year}.{julday}.{hour}.{format}'
+        file_path_name = trace_directory + '/' + file_name
             
-        sort_folder_path = f'{main_folder}/{sort_folder}'
-        
-        if not os.path.isdir(sort_folder_path):
-            os.makedirs(sort_folder_path)
-        
-        filename = f'{station}.{channel}.{start_time_formatted}.{format}'
-        
-        trace.write(f'./{sort_folder_path}/{filename}')
-    
-        
-        
-       
-        
-        
-        
-        
-        
-        
+        trace.write(file_path_name,format=format)
+
