@@ -9,6 +9,30 @@ import glob
 import pandas as pd
 
 def find_station_files(station1, station2, datafolder,name_structure=None):
+    """
+    Parameters
+    ----------
+    station1 : string
+        Name of station 1.
+    station2 : string
+        Name of station 2.
+    datafolder : string
+        Location of main data directory. ~ Will be automatically expanded to
+        the home directory.
+    name_structure : list, optional
+        A list giving the names of the data separated by periods in the name of
+        the file. For example, IU.ANMO.2023.157.9.MSEED would take a list 
+        ['network','station','year','julday','hour','format']. This is also the
+        default file structure assumed if none is given.
+
+    Returns
+    -------
+    station1_files : list
+        List of files found
+    station2_files : TYPE
+        List of files found.
+
+    """
     if '~' in datafolder:
         datafolder = os.path.expanduser(datafolder)
     
@@ -22,7 +46,7 @@ def find_station_files(station1, station2, datafolder,name_structure=None):
 
 def get_info_from_file_name(station1_files,station2_files,name_structure=None):
     if name_structure == None:
-        name_structure = ['network','station','year','julday','hour','MSEED']
+        name_structure = ['network','station','year','julday','hour','format']
         
     if len(station1_files) != len(station2_files):
         raise ValueError('Station 1 has a different number of windows than Station 2')
@@ -80,4 +104,4 @@ station1_files, station2_files = find_station_files('ANMO','TUC','~/Documents/Co
           
 df1, df2 = get_info_from_file_name(station1_files,station2_files,name_structure=None)       
 
-print(df1.head())                       
+                
