@@ -16,8 +16,10 @@ df1, df2 = prep.get_info_from_file_name(station1_files, station2_files, name_str
 pairs_list = prep.create_corresponding_files_list(df1, df2)
 
 
-test_pair = [pairs_list[0][1],pairs_list[0][1]]
-xcorr_times, xcorr = corr.cross_correlate_ambient_noise(test_pair,low=0.05)
+test_pair = [pairs_list[0][0],pairs_list[0][1]]
+xcorr_times, xcorr, xcorr_meta = corr.cross_correlate_ambient_noise(test_pair,low=0.05)
+
+print(xcorr_meta)
 
 plt.plot(xcorr_times, xcorr)
 

@@ -46,8 +46,32 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     xcorr = correlate(trace1_filtered, trace2_filtered,normalize=None,shift=npts)
     
     xcorr_times = create_ambient_times(npts,delta,time_method)
-    return xcorr_times, xcorr
+    
+    meta = {}
+    print(type(meta))
+    meta['network1'] = trace1.stats['network']
+    meta['station1'] = trace1.stats['station']
+    meta['network2'] = trace2.stats['network']
+    meta['station2'] = trace2.stats['station']
+    meta['year'] = trace1.stats['starttime'].year
+    meta['julday'] = trace1.stats['starttime'].julday
+    meta['hour'] = trace1.stats['starttime']
+    
+    return xcorr_times, xcorr, meta
    
+#def multi_correlate(pair_list,low,high=None,time_method='points'):
+    xcorr_list = []
+    
+    for pair in pair_list:
+        xcorr = cross_correlate_ambient_noise(pair,low,high,time_method)
+    
+    
+        
+    
+    
+    
+    
+    
 """ 
 def create_correlation_trace():
     # Creates a trace with the ambient times and the completed function

@@ -165,8 +165,3 @@ def create_corresponding_files_list(station1_df, station2_df, same=None):
             
     return corresponding_list
             
-def filter_file(trace, low=0.05,high=20,df=0.0125):
-    trace_filtered = trace.detrend()
-    trace_filtered = obspy.signal.filter.bandpass(trace, low, high, df)
-    
-    return trace_filtered
