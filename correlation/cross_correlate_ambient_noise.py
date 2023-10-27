@@ -44,7 +44,9 @@ def cross_correlate_ambient_noise(pair,low,high=None):
     xcorr_times = create_ambient_times(npts,delta)
     
     return xcorr_times, xcorr
-    
+   
+""" 
 def create_correlation_trace():
     # Creates a trace with the ambient times and the completed function
     pass
+"""
