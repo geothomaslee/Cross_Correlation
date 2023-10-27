@@ -63,7 +63,9 @@ def multi_correlate(pair_list,low,high=None,time_method='points'):
     xcorr_list = []
     
     for pair in pair_list:
-        xcorr = cross_correlate_ambient_noise(pair,low,high,time_method)
+        xcorr, xcorr_times, meta = cross_correlate_ambient_noise(pair,low,high,time_method)
+        
+    
     
 
         
