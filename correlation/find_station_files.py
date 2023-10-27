@@ -7,6 +7,8 @@ Created on Wed Oct 25 09:38:43 2023
 import os
 import glob
 import pandas as pd
+from tqdm import tqdm
+import obspy
 
 
 def find_station_files(station1, station2, datafolder):
@@ -122,36 +124,56 @@ def get_info_from_file_name(station1_files, station2_files, name_structure=None)
     return station1_df, station2_df
 
 
-def compare_files(station1_df, station2_df, different='station'):
-
-    # Checking the type for different. Assumed to be a list, if a string is given
+def create_corresponding_files_list(station1_df, station2_df, same=None):
+    # Checking the type for same. Assumed to be a list, if a string is given
     # then it will be turned into a list of length 1.
-
-    if different == None:
-        raise ValueError(
-            'The name of the information that should be different must be given')
-    elif type(different) == str:
-        different_list = [different]
-    elif type(different) == list:
-        different_list = different.copy()
+    if same == None:
+        same_list = ['julday','year','hour']
+    elif type(same) == str:
+        same_list = [same]
+    elif type(same) == list:
+        same_list = same.copy()
     else:
-        raise ValueError('Different must be a list')
+        raise ValueError('Same must be a list')
 
     # Checks to see that every item in different_list is a string
-    if all(isinstance(item, str) for item in different_list):
+    if all(isinstance(item, str) for item in same_list):
         pass
     else:
-        raise TypeError('Items in different list must be strings')
+        raise TypeError('Items in Same list must be strings')
    
+    # Check to see if they each have the same number of files
+    num_files = len(station1_df.index)
+    if num_files != len(station2_df.index):
+        raise ValueError('Station 2 has a different number of files than Station 1')
     
-   
-    
-   
-    
-station1_files, station2_files = find_station_files(
-    'ANMO', 'TUC', '~/Documents/Correlation_Testing_Data')
+    corresponding_list = []
+    for i in range(len(station1_df.index)):
+        corresponding_pair = []
+        file_stat_1 = station1_df.at[i,'file']
+        file_stat_2 = station2_df.at[i,'file']
+        
+        check_if_same = True
+        for check in same_list:
+            if station1_df.at[i,check] != station2_df.at[i,check]:
+                check_if_same = False
+            
+        if check_if_same:
+            corresponding_pair.append(file_stat_1)
+            corresponding_pair.append(file_stat_2)
+        
+        if corresponding_pair:
+            corresponding_list.append(corresponding_pair)
+            
+    return corresponding_list
+            
+            
+station1_files, station2_files = find_station_files('ANMO', 'TUC', '~/Documents/Correlation_Testing_Data')
 
-df1, df2 = get_info_from_file_name(
-    station1_files, station2_files, name_structure=None)
+df1, df2 = get_info_from_file_name(station1_files, station2_files, name_structure=None)
 
-compare_files(df1, df2)
+file_pairs = create_corresponding_files_list(df1, df2)
+
+for pair in tqdm(file_pairs):
+    print(pair[0])
+    print(pair[1])
