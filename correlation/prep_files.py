@@ -7,10 +7,10 @@ Created on Wed Oct 25 09:38:43 2023
 import os
 import glob
 import pandas as pd
-from tqdm import tqdm
 import obspy
+from tqdm import tqdm
 from obspy.signal.cross_correlation import correlate
-from obspy.signal import filter
+from obspy.signal.filter import bandpass
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -171,10 +171,40 @@ def create_corresponding_files_list(station1_df, station2_df, same=None):
             
     return corresponding_list
             
-            
+def filter_file(trace, low=0.05,high=20,df=0.0125):
+    trace_filtered = trace.detrend()
+    trace_filtered = obspy.signal.filter.bandpass(trace, low, high, df)
+    
+    return trace_filtered
+               
 station1_files, station2_files = find_station_files('ANMO', 'TUC', '~/Documents/Correlation_Testing_Data')
 
 df1, df2 = get_info_from_file_name(station1_files, station2_files, name_structure=None)
+
+pairs_list = create_corresponding_files_list(df1, df2)
+
+for pair in tqdm(pairs_list):
+    trace1 = obspy.read(pair[0])[0]
+    trace2 = obspy.read(pair[1])[0]
+    
+    npts=trace1.stats['npts']
+    delta=trace2.stats['delta']
+    sampling_rate = 1/delta
+    
+    high_freq = sampling_rate / 2
+    
+    trace1_filt = filter_file(trace1,high=high_freq,df=sampling_rate)
+    trace2_filt = filter_file(trace2,high=high_freq,df=sampling_rate)
+    
+    xcorr = obspy.signal.cross_correlation.correlate(trace1_filt,trace2_filt,
+                                                     npts,normalize=None)
+    
+    
+    
+    
+    
+    
+
 
 
 
