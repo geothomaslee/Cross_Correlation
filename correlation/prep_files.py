@@ -9,6 +9,10 @@ import glob
 import pandas as pd
 from tqdm import tqdm
 import obspy
+from obspy.signal.cross_correlation import correlate
+from obspy.signal import filter
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def find_station_files(station1, station2, datafolder):
@@ -172,8 +176,11 @@ station1_files, station2_files = find_station_files('ANMO', 'TUC', '~/Documents/
 
 df1, df2 = get_info_from_file_name(station1_files, station2_files, name_structure=None)
 
-file_pairs = create_corresponding_files_list(df1, df2)
 
-for pair in tqdm(file_pairs):
-    print(pair[0])
-    print(pair[1])
+
+
+
+
+    
+
+    
