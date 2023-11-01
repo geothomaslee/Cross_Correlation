@@ -9,10 +9,25 @@ import obspy
 import numpy as np
 from obspy.signal.cross_correlation import correlate
 from obspy.signal.filter import bandpass
-import matplotlib.pyplot as plt
 from statistics import mode
 
 def create_ambient_times(npts,delta,method='points'):
+    """
+    Parameters
+    ----------
+    npts : int
+        Number of points in the file.
+    delta : int or float
+        Time-step between points (40 samples per second = delta of 0.0125).
+    method : string, optional
+        'points' or 'seconds': Gives the time values as points or seconds
+
+    Returns
+    -------
+    times : TYPE
+        DESCRIPTION.
+
+    """
     if method == 'points':
         times = np.arange((0-npts),npts+1,1)
     elif method == 'seconds':
@@ -22,6 +37,28 @@ def create_ambient_times(npts,delta,method='points'):
     return times
 
 def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
+    """
+    Parameters
+    ----------
+    pair : list, length 2, of strings
+        List containung the path to the two files to be cross-correlated.
+    low : int or float
+        Low end of bandpass filtering.
+    high : int or float, optional
+        High end of bandpass filtering. Defaults to Nyquist frequency of files,
+        and will default to Nyquist frequency if given high is above it.
+    time_method : string, optional
+        'points' or 'seconds': Gives the time values as points or seconds.
+
+    Returns
+    -------
+    xcorr : numpy.ndarray
+        Cross-correlation function given as a numpy array.
+    xcorr_times : numpy.ndarray
+        Times for the cross-correlation function.
+    meta : dict
+        Dictionary containing meta-data for the correlation.
+    """
     trace1 = obspy.read(pair[0])[0]
     trace2 = obspy.read(pair[1])[0]
     
@@ -130,6 +167,18 @@ def multi_correlate(pair_list,low,high=None,time_method='points'):
     return xcorr_list_fixed, xcorr_times
 
 def xcorr_stack(xcorr_list):
+    """
+    Parameters
+    ----------
+    xcorr_list : list of numpy.ndarray
+        List of cross-correlation functions for each time window given as 
+        numpy arrays.
+
+    Returns
+    -------
+    xcorr_stack : numpy.ndarray
+        Numpy array containing the stacked cross-correlation function.
+    """
     xcorr_stack = sum(xcorr_list) / len(xcorr_list)
     return xcorr_stack
 

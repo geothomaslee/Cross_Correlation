@@ -7,7 +7,6 @@ Created on Wed Oct 25 09:38:43 2023
 import os
 import glob
 import pandas as pd
-import obspy
 
 def find_station_files(station1, station2, datafolder):
     """
@@ -123,6 +122,26 @@ def get_info_from_file_name(station1_files, station2_files, name_structure=None)
 
 
 def create_corresponding_files_list(station1_df, station2_df, same=None):
+    """
+    Parameters
+    ----------
+    station1_df : pandas.DataFrame
+        DataFrame containing information about the files to be correlated for 
+        the first station.
+    station2_df : pandas.DataFrame
+        DataFrame containing information about the files to be correlated for 
+        the second station.
+    same : list of strings
+        List of parameters that should be used to make sure files from the two
+        different stations correspond to the same time window. Defaults to
+        "julday", "year", "hour".
+
+    Returns
+    -------
+    corresponding_list : list of length-2 lists of strings
+        A list containing lists of length 2 that contain the path to the two
+        files that should be correlated.
+    """
     # Checking the type for same. Assumed to be a list, if a string is given
     # then it will be turned into a list of length 1.
     if same == None:
