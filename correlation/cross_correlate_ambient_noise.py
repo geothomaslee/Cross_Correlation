@@ -24,7 +24,15 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     trace1 = obspy.read(pair[0])[0]
     trace2 = obspy.read(pair[1])[0]
     
-    npts=trace1.stats['npts']
+    npts1=trace1.stats['npts']
+    npts2=trace2.stats['npts']
+    
+    if npts1 == npts2:
+        npts = npts1
+    else:
+        print(f'Files have different number of points. Using npts1')
+        npts = npts1
+    
     delta=trace1.stats['delta']
     sampling_rate = 1/delta
     
@@ -48,7 +56,6 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     xcorr_times = create_ambient_times(npts,delta,time_method)
     
     meta = {}
-    print(type(meta))
     meta['network1'] = trace1.stats['network']
     meta['station1'] = trace1.stats['station']
     meta['network2'] = trace2.stats['network']
@@ -56,7 +63,7 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     meta['year'] = trace1.stats['starttime'].year
     meta['julday'] = trace1.stats['starttime'].julday
     meta['hour'] = trace1.stats['starttime']
-    
+
     return xcorr_times, xcorr, meta
    
 def multi_correlate(pair_list,low,high=None,time_method='points'):
