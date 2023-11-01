@@ -8,8 +8,6 @@ Created on Wed Oct  4 08:53:27 2023
 from correlation import prep_files as prep
 from correlation import cross_correlate_ambient_noise as corr
 import matplotlib.pyplot as plt
-from statistics import mode
-import numpy as np
 
 station1_files, station2_files = prep.find_station_files('ANMO', 'TUC', '~/Documents/Correlation_Testing_Data')
 
