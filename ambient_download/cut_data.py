@@ -70,8 +70,8 @@ def cut_traces_into_windows(stream, windowlength):
     """
     Parameters
     ----------
-    trace : obspy.core.trace.Trace
-        The ObsPy trace that you want to cut.
+    stream : obspy.core.stream.Stream
+        An ObsPy stream containing your data.
     windowlength : int
         length, in seconds, of the desired cut window.
 
@@ -115,11 +115,6 @@ def cut_traces_into_windows(stream, windowlength):
                                                          time_window = windowlength,
                                                          total_time = total_time_whole,
                                                          delta = delta)
-    
-    print(len(start_time_list))
-    print(len(end_time_list))
-    
-    print(start_time_list)
     
     # This adds back in the remainder time length
     if window_remainder != 0:

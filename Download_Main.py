@@ -34,18 +34,14 @@ def main():
     starttime = "2022-01-01T00:00:00.000"
     endtime = "2022-02-01T00:00:00.000"
     
-    stream = obspy.read('./test_data_2.mseed')
-
-    """
     stream = download_trace(client="IRIS",
                                   network="IU",
-                                  station="ANMO",
+                                  station="TUC",
                                   location="00",
                                   channel="BHZ",
                                   starttime=starttime,
                                   timewindow=endtime)
-    """
-                         
+    
     cut_stream = cut_traces_into_windows(stream,windowlength=3600)
     
     sort_method_list = ['station','year','julday']
