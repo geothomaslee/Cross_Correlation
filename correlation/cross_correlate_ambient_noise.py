@@ -36,6 +36,20 @@ def create_ambient_times(npts,delta,method='points'):
         
     return times
 
+def filter_trace(trace,df,low=0.01,high=10,new_samp_rate=20):
+    factor = int(df / new_samp_rate)
+    
+    if factor <= 1:
+        raise ValueError('New delta is greater than current')
+    
+    trace_downsample = trace.decimate(factor)
+    
+    trace_detrend = trace_downsample.detrend()
+    
+    trace_filter = trace_detrend.filter('bandpass',freqmin=low,freqmax=high)
+    
+    return trace_filter
+
 def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     """
     Parameters
@@ -62,17 +76,8 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     trace1 = obspy.read(pair[0])[0]
     trace2 = obspy.read(pair[1])[0]
     
-    npts1=trace1.stats['npts']
-    npts2=trace2.stats['npts']
-    
-    if npts1 == npts2:
-        npts = npts1
-    else:
-        print(f'Files have different number of points. Using npts1 {npts1}')
-        npts = npts1
-    
     delta=trace1.stats['delta']
-    sampling_rate = 1/delta
+    sampling_rate = int(1/delta)
     
     if high == None:
         high_freq = (sampling_rate / 2) - delta
@@ -81,17 +86,23 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     else:
         raise TypeError('High must be int or float')
     
-    trace1_filtered = trace1.detrend()
-    trace1_filtered = bandpass(trace1,freqmin=low,freqmax=high_freq,
-                               df=sampling_rate,corners=4)
+    trace1_filt = filter_trace(trace=trace1,
+                               df=sampling_rate,
+                               low=low,
+                               high=high_freq,
+                               new_samp_rate=20)
+    trace2_filt = filter_trace(trace=trace2,
+                               df=sampling_rate,
+                               low=low,
+                               high=high_freq,
+                               new_samp_rate=20)
     
-    trace2_filtered = trace2.detrend()
-    trace2_filtered = bandpass(trace2,freqmin=low,freqmax=high_freq,
-                               df=sampling_rate,corners=4)
+    npts = trace1_filt.stats['npts']
+    delta_new = trace1_filt.stats['delta']
     
-    xcorr = correlate(trace1_filtered, trace2_filtered,normalize=None,shift=npts)
+    xcorr = correlate(trace1_filt, trace2_filt,normalize=None,shift=npts)
     
-    xcorr_times = create_ambient_times(npts,delta,time_method)
+    xcorr_times = create_ambient_times(npts,delta_new,time_method)
     
     meta = {}
     meta['network1'] = trace1.stats['network']
