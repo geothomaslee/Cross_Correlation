@@ -8,6 +8,7 @@ Created on Wed Oct  4 08:53:27 2023
 from correlation import prep_files as prep
 from correlation import cross_correlate_ambient_noise as corr
 import matplotlib.pyplot as plt
+from obspy.signal.filter import bandpass
 
 station1_files, station2_files = prep.find_station_files('ANMO', 'RSSD', '~/Documents/Correlation_Testing_Data')
 
@@ -30,7 +31,9 @@ xcorr_list, xcorr_times = corr.multi_correlate(pairs_list,low=0.01,high=5)
 
 xcorr_stack = corr.xcorr_stack(xcorr_list)
 
-plt.plot(xcorr_times,xcorr_stack)
+xcorr_stack_bp = bandpass(xcorr_stack,freqmin=0.01,freqmax=5,df=20)
+
+plt.plot(xcorr_times,xcorr_stack_bp)
 
     
 

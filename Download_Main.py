@@ -15,12 +15,12 @@ from tqdm import tqdm
 from obspy import UTCDateTime
 
 def main():
-    starttime = "2022-06-01T00:00:00.000"
-    endtime = "2022-07-01T00:00:00.000"
+    starttime = "2022-01-01T00:00:00.000"
+    endtime = "2022-03-01T00:00:00.000"
 
     stream = download_trace(client="IRIS",
                                   network="IU",
-                                  station="RSSD",
+                                  station="TUC",
                                   location="00",
                                   channel="BHZ",
                                   starttime=starttime,
