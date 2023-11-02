@@ -8,7 +8,7 @@ Created on Thu Sep 28 12:27:44 2023
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 
-def download_trace(client,starttime, timewindow, network, station,location, channel):
+def download_trace(client, starttime, timewindow, network, station, location, channel):
     """
     Parameters
     ----------
@@ -50,7 +50,7 @@ def download_trace(client,starttime, timewindow, network, station,location, chan
             timewindow_int = 3600
             endtime = starttime_int + timewindow_int
         else:
-            endtime = timewindow # If it's a string that's not an amount of time
+            endtime = UTCDateTime(timewindow) # If it's a string that's not an amount of time
                                  # Then this assumes it's the end time
             print('Warning: string given for time_window, now assuming given string is the end time')
                                  
@@ -59,8 +59,12 @@ def download_trace(client,starttime, timewindow, network, station,location, chan
     else:
         raise TypeError('Timewindow must be an integer or string specifying the end time')
     
-    stream = client_int.get_waveforms(network, station, 
-                                      location, channel, 
-                                      starttime_int, endtime)
+    
+    stream = client_int.get_waveforms(network=network,
+                                      station=station,
+                                      location=location,
+                                      channel=channel,
+                                      starttime = starttime_int,
+                                      endtime = endtime)
     
     return stream
