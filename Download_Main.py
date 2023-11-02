@@ -14,19 +14,39 @@ import numpy as np
 from tqdm import tqdm
 from obspy import UTCDateTime
 
+
+"""
+starttime = "2022-01-01T00:00:00.000"
+endtime = "2022-02-01T00:00:00.000"
+stream = download_trace(client="IRIS",
+                              network="IU",
+                              station="ANMO",
+                              location="00",
+                              channel="BHZ",
+                              starttime=starttime,
+                              timewindow=endtime)
+
+stream.write('./test_data_2','MSEED')
+"""
+
+
 def main():
     starttime = "2022-01-01T00:00:00.000"
-    endtime = "2022-03-01T00:00:00.000"
+    endtime = "2022-02-01T00:00:00.000"
+    
+    stream = obspy.read('./test_data_2.mseed')
 
+    """
     stream = download_trace(client="IRIS",
                                   network="IU",
-                                  station="TUC",
+                                  station="ANMO",
                                   location="00",
                                   channel="BHZ",
                                   starttime=starttime,
                                   timewindow=endtime)
-                                  
-    cut_stream = cut_traces_into_windows(trace=stream[0],windowlength=3600)
+    """
+                         
+    cut_stream = cut_traces_into_windows(stream,windowlength=3600)
     
     sort_method_list = ['station','year','julday']
     
@@ -38,4 +58,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-    

@@ -66,7 +66,7 @@ def get_ambient_windows(starttime, time_window, total_time, delta, cut_endpoint 
     
     return start_time_list, end_time_list
 
-def cut_traces_into_windows(trace, windowlength):
+def cut_traces_into_windows(stream, windowlength):
     """
     Parameters
     ----------
@@ -80,13 +80,17 @@ def cut_traces_into_windows(trace, windowlength):
     int_func_stream : obspy.core.stream.Stream
         An ObsPy stream containing all of the cut traces
     """
-    starttime = trace.stats['starttime']
-    endtime = trace.stats['endtime']
-    delta = trace.stats['delta']
-    npts = trace.stats['npts']
+    
+    starttime = stream[0].stats['starttime']
+    endtime = stream[-1].stats['endtime']
+    delta = stream[0].stats['delta']
+    
+    npts = ((endtime - starttime) / delta) + 1
     
     # Checks to see if total time in trace is divisible by desired window length
     num_whole_windows, window_remainder = divide_with_remainder(npts, (windowlength / delta))
+    
+    print(f'window_remainder {window_remainder}')
     
     if window_remainder != 0:
         print('Warning: Amount of time downloaded not perfectly visible by the desired cut window length') 
@@ -112,6 +116,11 @@ def cut_traces_into_windows(trace, windowlength):
                                                          total_time = total_time_whole,
                                                          delta = delta)
     
+    print(len(start_time_list))
+    print(len(end_time_list))
+    
+    print(start_time_list)
+    
     # This adds back in the remainder time length
     if window_remainder != 0:
         start_time_list.append(end_time_list[-1])
@@ -124,8 +133,24 @@ def cut_traces_into_windows(trace, windowlength):
     for i in range(num_windows):
         cut_start = start_time_list[i]
         cut_end = end_time_list[i]
-        cut_trace = trace.slice(cut_start,cut_end)
+        cut_trace = stream.slice(cut_start,cut_end)[0]
         int_func_stream.append(cut_trace)
         
     return int_func_stream
+
+"""
+starttime = "2022-01-01T00:00:00.000"
+endtime = "2022-02-01T00:00:00.000"
+
+starttime_utc = UTCDateTime(starttime)
+endtime_utc = UTCDateTime(endtime)
+total_time = endtime_utc - starttime_utc
+
+test_stream = obspy.read('../test_data_2.mseed')
+test_stream.plot()
+
+cut_stream = cut_traces_into_windows(test_stream, 86400)
+
+print(len(cut_stream))
+"""
     
