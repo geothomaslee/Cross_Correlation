@@ -36,7 +36,32 @@ def create_ambient_times(npts,delta,method='points'):
         
     return times
 
-def filter_trace(trace,df,low=0.01,high=10,new_samp_rate=20):
+def filter_trace(trace,df,low=0.02,high=0.5,new_samp_rate=20):
+    """
+    Parameters
+    ----------
+    trace : TYPE
+        DESCRIPTION.
+    df : int
+        Samples per second.
+    low : TYPE, optional
+        DESCRIPTION. The default is 0.02.
+    high : TYPE, optional
+        DESCRIPTION. The default is 0.5.
+    new_samp_rate : TYPE, optional
+        DESCRIPTION. The default is 20.
+
+    Raises
+    ------
+    ValueError
+        DESCRIPTION.
+
+    Returns
+    -------
+    trace_filter : TYPE
+        DESCRIPTION.
+
+    """
     factor = int(df / new_samp_rate)
     
     if factor <= 1:
@@ -50,7 +75,7 @@ def filter_trace(trace,df,low=0.01,high=10,new_samp_rate=20):
     
     return trace_filter
 
-def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
+def cross_correlate_ambient_noise(pair,time_method='points'):
     """
     Parameters
     ----------
@@ -79,22 +104,20 @@ def cross_correlate_ambient_noise(pair,low,high=None,time_method='points'):
     delta=trace1.stats['delta']
     sampling_rate = int(1/delta)
     
+    """
     if high == None:
         high_freq = (sampling_rate / 2) - delta
     elif type(high) == int or type(high) == float:
         high_freq = high
     else:
         raise TypeError('High must be int or float')
+    """
     
     trace1_filt = filter_trace(trace=trace1,
                                df=sampling_rate,
-                               low=low,
-                               high=high_freq,
                                new_samp_rate=20)
     trace2_filt = filter_trace(trace=trace2,
                                df=sampling_rate,
-                               low=low,
-                               high=high_freq,
                                new_samp_rate=20)
     
     npts = trace1_filt.stats['npts']
@@ -177,6 +200,53 @@ def multi_correlate(pair_list,low,high=None,time_method='points'):
     
     return xcorr_list_fixed, xcorr_times
 
+def running_average_filter(xcorr, xcorr_times, avg_window=20):
+    """
+
+    Parameters
+    ----------
+    xcorr : numpy.ndarray
+        Cross-correlation function in a NumPy array.
+    xcorr_times : numpy.ndarray
+        Times for the cross-correlation function.
+    avg_window : int, optional
+        Number of points to include in the moving average filter. 
+        The default is 20.
+
+    Returns
+    -------
+    xcorr_averaged : numpy.ndarray
+        Cross-correlation smoothed using a moving average.
+    xcorr_averaged_times : numpy.ndarray
+        Times, but with the first and last avg_window/2 points removed because
+        this moving average filter just starts at the first point with sufficient
+        number of points on either side of the current point to calculate the
+        moving average.
+    """
+    xcorr_averaged = []
+    
+    npts = len(xcorr)
+    
+    lower_bound_all = int(avg_window / 2)
+    upper_bound_all =  int(npts - (avg_window / 2))
+    
+    for i in np.arange(lower_bound_all, upper_bound_all, 1):
+        
+        int_i = int(i)
+        upper_bound = int_i + avg_window
+        avg_window_values = xcorr[int_i:upper_bound]
+        avg = np.mean(avg_window_values)
+        
+        xcorr_averaged.append(avg)
+        
+        
+    xcorr_averaged_times=xcorr_times[lower_bound_all:upper_bound_all]
+        
+    print(len(xcorr_averaged))
+    print(len(xcorr_averaged_times))
+    
+    return xcorr_averaged, xcorr_averaged_times
+        
 def xcorr_stack(xcorr_list):
     """
     Parameters
