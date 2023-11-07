@@ -8,7 +8,7 @@ Created on Wed Oct  4 08:53:27 2023
 from correlation import prep_files as prep
 from correlation import cross_correlate_ambient_noise as corr
 import matplotlib.pyplot as plt
-import obspy
+import time
 
 station1_files, station2_files = prep.find_station_files('ANMO', 'TUC', './Downloaded_Traces')
 
@@ -28,12 +28,15 @@ plt.title('Averaged')
 plt.show()
 """
 
+start_time = time.perf_counter()
 
 xcorr_list, xcorr_times = corr.multi_correlate(pairs_list)
-
 xcorr_stack = corr.xcorr_stack(xcorr_list)
-
 plt.plot(xcorr_times,xcorr_stack)
+
+end_time = time.perf_counter()
+
+print(f'Correlation took {end_time - start_time} seconds')
 
 
     
