@@ -36,44 +36,30 @@ def create_ambient_times(npts,delta,method='points'):
         
     return times
 
-def filter_trace(trace,df,low=0.02,high=0.5,new_samp_rate=20):
+def filter_stream(stream):
     """
+    Cross-correlation pre-processing method after Jiang et. al., 2023
+    
+    Detrend, max 0.1% taper, 4-pole 2-pass Butterworth bandpass from 0.02 to 
+    0.5 Hz, downsample to 1 Hz
+
     Parameters
     ----------
-    trace : TYPE
-        DESCRIPTION.
-    df : int
-        Samples per second.
-    low : TYPE, optional
-        DESCRIPTION. The default is 0.02.
-    high : TYPE, optional
-        DESCRIPTION. The default is 0.5.
-    new_samp_rate : TYPE, optional
-        DESCRIPTION. The default is 20.
-
-    Raises
-    ------
-    ValueError
+    stream : TYPE
         DESCRIPTION.
 
     Returns
     -------
-    trace_filter : TYPE
+    stream : TYPE
         DESCRIPTION.
 
     """
-    factor = int(df / new_samp_rate)
+    stream.detrend()
+    stream.taper(0.1)
+    stream.filter('bandpass',freqmin=0.02,freqmax=0.5,corners=4)
+    stream.resample(1)
     
-    if factor <= 1:
-        raise ValueError('New delta is greater than current')
-    
-    trace_downsample = trace.decimate(factor)
-    
-    trace_detrend = trace_downsample.detrend()
-    
-    trace_filter = trace_detrend.filter('bandpass',freqmin=low,freqmax=high)
-    
-    return trace_filter
+    return stream
 
 def cross_correlate_ambient_noise(pair,time_method='points'):
     """
@@ -98,43 +84,26 @@ def cross_correlate_ambient_noise(pair,time_method='points'):
     meta : dict
         Dictionary containing meta-data for the correlation.
     """
-    trace1 = obspy.read(pair[0])[0]
-    trace2 = obspy.read(pair[1])[0]
+    stream = obspy.read(pair[0])
+    stream.append(obspy.read(pair[1])[0])
     
-    delta=trace1.stats['delta']
-    sampling_rate = int(1/delta)
+    stream_filtered = filter_stream(stream)
     
-    """
-    if high == None:
-        high_freq = (sampling_rate / 2) - delta
-    elif type(high) == int or type(high) == float:
-        high_freq = high
-    else:
-        raise TypeError('High must be int or float')
-    """
+    npts = stream_filtered[0].stats['npts']
+    delta_new = stream_filtered[0].stats['delta']
     
-    trace1_filt = filter_trace(trace=trace1,
-                               df=sampling_rate,
-                               new_samp_rate=20)
-    trace2_filt = filter_trace(trace=trace2,
-                               df=sampling_rate,
-                               new_samp_rate=20)
-    
-    npts = trace1_filt.stats['npts']
-    delta_new = trace1_filt.stats['delta']
-    
-    xcorr = correlate(trace1_filt, trace2_filt,normalize=None,shift=npts)
+    xcorr = correlate(stream_filtered[0], stream_filtered[1],normalize=None,shift=npts)
     
     xcorr_times = create_ambient_times(npts,delta_new,time_method)
     
     meta = {}
-    meta['network1'] = trace1.stats['network']
-    meta['station1'] = trace1.stats['station']
-    meta['network2'] = trace2.stats['network']
-    meta['station2'] = trace2.stats['station']
-    meta['year'] = trace1.stats['starttime'].year
-    meta['julday'] = trace1.stats['starttime'].julday
-    meta['hour'] = trace1.stats['starttime']
+    meta['network1'] = stream_filtered[0].stats['network']
+    meta['station1'] = stream_filtered[0].stats['station']
+    meta['network1'] = stream_filtered[1].stats['network']
+    meta['station1'] = stream_filtered[1].stats['station']
+    meta['year'] = stream_filtered[0].stats['starttime'].year
+    meta['julday'] = stream_filtered[0].stats['starttime'].julday
+    meta['hour'] = stream_filtered[0].stats['starttime']
 
     return xcorr, xcorr_times, meta
 
@@ -168,7 +137,7 @@ def check_correlation_length(xcorr_list):
             
     return xcorr_list
    
-def multi_correlate(pair_list,low,high=None,time_method='points'):
+def multi_correlate(pair_list,time_method='points'):
     """
     Parameters
     ----------
@@ -193,8 +162,7 @@ def multi_correlate(pair_list,low,high=None,time_method='points'):
     xcorr_list = []
     
     for pair in pair_list:
-        xcorr, xcorr_times, meta = cross_correlate_ambient_noise(pair,low,high,time_method)
-        xcorr_list.append(xcorr)
+        xcorr, xcorr_times, meta = cross_correlate_ambient_noise(pair,time_method)
         
     xcorr_list_fixed = check_correlation_length(xcorr_list)
     

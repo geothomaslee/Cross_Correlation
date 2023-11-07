@@ -16,18 +16,6 @@ df1, df2 = prep.get_info_from_file_name(station1_files, station2_files, name_str
 
 pairs_list = prep.create_corresponding_files_list(df1, df2)
 
-
-test_pair = pairs_list[0]
-
-stream = obspy.read(test_pair[0])
-stream.append(obspy.read(test_pair[1])[0])
-
-stream.plot()
-
-trace1_test = corr.filter_trace(stream[0],40)
-
-stream[0].plot()
-trace1_test.plot()
 """
 xcorr, xcorr_times, xcorr_meta = corr.cross_correlate_ambient_noise(test_pair)
 plt.plot(xcorr_times, xcorr)
@@ -40,17 +28,12 @@ plt.title('Averaged')
 plt.show()
 """
 
-
-
-"""
-xcorr_list, xcorr_times = corr.multi_correlate(pairs_list,low=0.01,high=5)
+xcorr_list, xcorr_times = corr.multi_correlate(pairs_list)
 
 xcorr_stack = corr.xcorr_stack(xcorr_list)
 
-xcorr_stack_bp = bandpass(xcorr_stack,freqmin=0.01,freqmax=5,df=20)
+plt.plot(xcorr_times,xcorr_stack)
 
-plt.plot(xcorr_times,xcorr_stack_bp)
-"""
     
 
 
