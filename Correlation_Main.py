@@ -45,10 +45,18 @@ plt.plot(xcorr_averaged_times, xcorr_averaged,'r-')
 plt.title('Averaged')
 plt.show()
 
+
 xcorr_averaged_times_cut = xcorr_averaged_times[3540:3660]
 xcorr_averaged_cut = xcorr_averaged[3540:3660]
-plt.plot(xcorr_averaged_times_cut,xcorr_averaged_cut,'g-')
+plt.plot(xcorr_averaged_times_cut,xcorr_averaged_cut)
+plt.title('Averged Zoomed')
+plt.show()
 
+xcorr_times_cut = xcorr_times[3540:3660]
+xcorr_cut = xcorr_stack[3540:3660]
+plt.plot(xcorr_times_cut,xcorr_cut,'g-')
+plt.title('Unaveraged Zoomed')
+plt.show()
 
 
     
