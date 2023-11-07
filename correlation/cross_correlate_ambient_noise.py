@@ -8,7 +8,6 @@ Created on Thu Oct 26 22:34:22 2023
 import obspy
 import numpy as np
 from obspy.signal.cross_correlation import correlate
-from obspy.signal.filter import bandpass
 from statistics import mode
 
 def create_ambient_times(npts,delta,method='points'):
@@ -24,8 +23,8 @@ def create_ambient_times(npts,delta,method='points'):
 
     Returns
     -------
-    times : TYPE
-        DESCRIPTION.
+    times : np.ndarray
+        NumPy array containing the times for the cross-correlation function.
 
     """
     if method == 'points':
@@ -45,14 +44,13 @@ def filter_stream(stream):
 
     Parameters
     ----------
-    stream : TYPE
-        DESCRIPTION.
+    stream : obspy.core.stream.Stream
+        ObsPy stream containing trace(s) to be filtered.
 
     Returns
     -------
-    stream : TYPE
-        DESCRIPTION.
-
+    stream : obspy.core.stream.Stream
+        ObsPy stream containing the filtered trace(s).
     """
     stream.detrend()
     stream.taper(0.1)
@@ -67,11 +65,6 @@ def cross_correlate_ambient_noise(pair,time_method='points'):
     ----------
     pair : list, length 2, of strings
         List containung the path to the two files to be cross-correlated.
-    low : int or float
-        Low end of bandpass filtering.
-    high : int or float, optional
-        High end of bandpass filtering. Defaults to Nyquist frequency of files,
-        and will default to Nyquist frequency if given high is above it.
     time_method : string, optional
         'points' or 'seconds': Gives the time values as points or seconds.
 
@@ -109,10 +102,16 @@ def cross_correlate_ambient_noise(pair,time_method='points'):
 
 def check_correlation_length(xcorr_list):
     """
+    Makes sure that all traces have the same length because occasionally they
+    come out a point or two less than they should be. If this is the case, just
+    adds zeros to bring it up to the proper length because data at these 
+    extremes has mostly been tapered out anyway.
+    
     Parameters
     ----------
     xcorr_list : list of numpy.ndarray
         List of cross-correlation functions given as numpy arrays
+        
     Returns
     -------
     xcorr_list : numpy.ndarray
@@ -143,11 +142,7 @@ def multi_correlate(pair_list,time_method='points'):
     ----------
     pair_list : list of length-2 lists of strings
         List of lists, each sub-list being a pair of strings giving the file path
-        to the files to be cross-correlation
-    low : int or float
-        Low end of bandpass filter. Suggested 0.05Hz = 20 second period.
-    high : int or float, optional
-        High end of bandpass filter. Defaults to Nyquist frequency of the files.
+        to the files to be cross-correlation.
     time_method : string, optional
         'points' or 'seconds': Gives the list of times as points or seconds.
 
@@ -155,7 +150,8 @@ def multi_correlate(pair_list,time_method='points'):
     -------
     xcorr_list_fixed : list of numpy.ndarray
         List containing the cross-correlation functions for each window given
-        as a numpy array.
+        as a numpy array. _fixed refers to it having been run through
+        check_correlation_length, see check_correlation_length for details.
     xcorr_times : numpy.ndarray
         Times for the cross-correlation function, given as a numpy array.
     """
@@ -171,7 +167,6 @@ def multi_correlate(pair_list,time_method='points'):
 
 def running_average_filter(xcorr, xcorr_times, avg_window=20):
     """
-
     Parameters
     ----------
     xcorr : numpy.ndarray
@@ -211,9 +206,6 @@ def running_average_filter(xcorr, xcorr_times, avg_window=20):
         
     xcorr_averaged_times=xcorr_times[lower_bound_all:upper_bound_all]
         
-    print(len(xcorr_averaged))
-    print(len(xcorr_averaged_times))
-    
     return xcorr_averaged, xcorr_averaged_times
         
 def xcorr_stack(xcorr_list):

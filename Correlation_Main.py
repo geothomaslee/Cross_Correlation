@@ -33,13 +33,21 @@ start_time = time.perf_counter()
 xcorr_list, xcorr_times = corr.multi_correlate(pairs_list)
 xcorr_stack = corr.xcorr_stack(xcorr_list)
 plt.plot(xcorr_times,xcorr_stack)
+plt.title('Unaveraged')
+plt.show()
 
 end_time = time.perf_counter()
 
 print(f'Correlation took {end_time - start_time} seconds')
 
+xcorr_averaged, xcorr_averaged_times = corr.running_average_filter(xcorr_stack,xcorr_times,avg_window=20)
+plt.plot(xcorr_averaged_times, xcorr_averaged,'.r-')
+plt.title('Averaged')
+plt.show()
 
-    
+xcorr_averaged_times_cut = xcorr_averaged_times[3540:3660]
+xcorr_averaged_cut = xcorr_averaged[3540:3660]
+plt.plot(xcorr_averaged_times_cut,xcorr_averaged_cut,'.r-')
 
 
 
