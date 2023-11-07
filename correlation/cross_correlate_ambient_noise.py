@@ -85,6 +85,8 @@ def cross_correlate_ambient_noise(pair,time_method='points'):
     npts = stream_filtered[0].stats['npts']
     delta_new = stream_filtered[0].stats['delta']
     
+    stream.detrend() # Remove trend again, after Jiang et. al., 2023
+    
     xcorr = correlate(stream_filtered[0], stream_filtered[1],normalize=None,shift=npts)
     
     xcorr_times = create_ambient_times(npts,delta_new,time_method)
