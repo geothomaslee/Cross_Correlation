@@ -163,6 +163,7 @@ def multi_correlate(pair_list,time_method='points'):
     
     for pair in pair_list:
         xcorr, xcorr_times, meta = cross_correlate_ambient_noise(pair,time_method)
+        xcorr_list.append(xcorr)
         
     xcorr_list_fixed = check_correlation_length(xcorr_list)
     

@@ -28,11 +28,13 @@ plt.title('Averaged')
 plt.show()
 """
 
+
 xcorr_list, xcorr_times = corr.multi_correlate(pairs_list)
 
 xcorr_stack = corr.xcorr_stack(xcorr_list)
 
 plt.plot(xcorr_times,xcorr_stack)
+
 
     
 
